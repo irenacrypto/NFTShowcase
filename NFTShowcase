@@ -1,0 +1,98 @@
+import json
+from typing import List, Dict
+
+class NFT:
+    def __init__(self, id: str, name: str, metadata: Dict):
+        self.id = id
+        self.name = name
+        self.metadata = metadata
+        self.owner = None
+
+    def mint(self, owner: str):
+        if self.owner:
+            print(f"NFT {self.id} is already minted.")
+            return False
+        self.owner = owner
+        print(f"NFT {self.id} minted to {owner}.")
+        return True
+
+    def transfer(self, new_owner: str):
+        if not self.owner:
+            print(f"NFT {self.id} is not yet minted.")
+            return False
+        self.owner = new_owner
+        print(f"NFT {self.id} transferred to {new_owner}.")
+        return True
+
+    def to_dict(self) -> Dict:
+        return {
+            "ID": self.id,
+            "Name": self.name,
+            "Metadata": self.metadata,
+            "Owner": self.owner
+        }
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+class NFTShowcase:
+    def __init__(self):
+        self.nfts = {}  # Maps NFT ID to NFT object
+
+    def create_nft(self, id: str, name: str, metadata: Dict):
+        if id in self.nfts:
+            print(f"NFT with ID {id} already exists.")
+            return False
+        nft = NFT(id, name, metadata)
+        self.nfts[id] = nft
+        print(f"Created NFT {id} ({name}) with metadata: {metadata}.")
+        return True
+
+    def mint_nft(self, id: str, owner: str):
+        if id not in self.nfts:
+            print(f"NFT with ID {id} does not exist.")
+            return False
+        nft = self.nfts[id]
+        return nft.mint(owner)
+
+    def transfer_nft(self, id: str, new_owner: str):
+        if id not in self.nfts:
+            print(f"NFT with ID {id} does not exist.")
+            return False
+        nft = self.nfts[id]
+        return nft.transfer(new_owner)
+
+    def get_nft_info(self, id: str) -> Dict:
+        if id not in self.nfts:
+            print(f"NFT with ID {id} does not exist.")
+            return None
+        nft = self.nfts[id]
+        return nft.to_dict()
+
+    def showcase_nfts(self) -> List[Dict]:
+        return [nft.to_dict() for nft in self.nfts.values()]
+
+# Example Usage
+nft_showcase = NFTShowcase()
+
+# Create NFTs
+nft_showcase.create_nft("1", "CryptoArt #1", {"artist": "Alice", "year": 2024})
+nft_showcase.create_nft("2", "CryptoArt #2", {"artist": "Bob", "year": 2024})
+
+# Mint NFTs
+nft_showcase.mint_nft("1", "alice")
+nft_showcase.mint_nft("2", "bob")
+
+# Transfer NFTs
+nft_showcase.transfer_nft("1", "carol")
+
+# Showcase all NFTs
+print("\nNFT Showcase:")
+showcase = nft_showcase.showcase_nfts()
+for nft in showcase:
+    print(json.dumps(nft, indent=4))
+
+# Get specific NFT information
+print("\nNFT Information:")
+print(nft_showcase.get_nft_info("1"))
+print(nft_showcase.get_nft_info("2"))
